@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Chart.js</title>
+	</head>
+
+	<body>
+		<div>
+			<canvas id="myChart"></canvas>
+		</div>
+
+		<script src="./dist/chart.umd.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+
+		<script>
+			const ctx = document.getElementById('myChart');
+
+			class DashedBorderBar extends Chart.BarController {
+			  draw() {
+			    super.draw(arguments);
+			    const ctx = this.chart.ctx;
+			    ctx.save();
+			    const dataset = this.chart.data.datasets[0];
+
+			    if (dataset.type === 'dashedBorderBar') {
+			      this.getMeta().data.forEach((element, idx) => {
+			        if (!element.options?.borderColor) {
+			          return;
+			        }
+
+			        if (idx === 0 || idx === dataset.data.length - 1) {
+			          element.draw = element.draw;
+			        } else {
+			          element.draw = (ctxElement) => {
+			            ctxElement.strokeStyle =
+										element.options.borderColor;
+			            ctxElement.lineWidth =
+										dataset.dashedBorderWidth;
+			            ctxElement.setLineDash(dataset.borderDash);
+			            ctxElement.fillStyle =
+										element.options.backgroundColor;
+
+			            ctxElement.strokeRect(
+			              element.x - element.width / 2,
+			              element.y,
+			              element.width,
+			              element.height + ctxElement.lineWidth
+			            );
+			          };
+			        }
+			      });
+			      ctx.restore();
+			    }
+			  }
+			}
+
+			DashedBorderBar.id = 'dashedBorderBar';
+			DashedBorderBar.defaults = DashedBorderBar.defaults;
+
+			Chart.register(DashedBorderBar, ChartDataLabels);
+
+			const labels = [
+			  'Current supply',
+			  'Jan 2023',
+			  'Feb 2023',
+			  'Mar 2023',
+			  'Apr 2023',
+			  'May 2023',
+			  'Jun 2023',
+			  'Jun 2023',
+			  'Jun 2023',
+			  '',
+			];
+
+			const data = {
+			  labels,
+			  datasets: [
+			    {
+			      type: 'dashedBorderBar',
+			      label: 'Bar',
+			      data: [
+			        1426,
+			        [150, 1430],
+			        [150, 1430],
+
+			        null,
+			        null,
+			        null,
+			        [550, 1440],
+			        null,
+			        [50, 1440],
+			        1426,
+			      ],
+			      borderSkipped: false,
+			      borderColor: [
+			        'rgb(75, 192, 192, 1)',
+			        'rgb(75, 192, 192, 1)',
+			        'rgb(75, 192, 192, 1)',
+
+			        ,
+			        ,,
+			        'rgb(247, 117, 104, 1)',
+			        'rgb(247, 117, 104, 1)',
+			        'rgb(247, 117, 104, 1)',
+			        'rgb(247, 117, 104, 1)',
+			      ],
+			      dashedBorderWidth: 2,
+			      borderDash: [5, 5],
+			      backgroundColor: [
+			        'rgb(75, 192, 192)',
+			        'rgb(75, 192, 192, 0)',
+			        'rgb(75, 192, 192, 0)',
+
+			        ,
+			        ,,
+			        'rgb(247, 117, 104, 0)',
+			        'rgb(247, 117, 104, 0)',
+			        'rgb(247, 117, 104, 0)',
+			        'rgb(247, 117, 104)',
+			      ],
+			      datalabels: {
+			        color: 'black',
+			      },
+			    },
+			    {
+			      type: 'line',
+			      label: 'Line',
+			      borderColor: 'rgb(56, 178, 172)',
+			      borderWidth: 4,
+			      fill: false,
+			      data: [
+			        1428,
+			        1420,
+			        1420,
+			        1340,
+			        1140,
+			        700,
+			        500,
+			        180,
+			        50,
+			        null,
+			      ],
+			      pointRadius: 0,
+			      datalabels: {
+			        display: false,
+			      },
+			    },
+			    {
+			      type: 'line',
+			      label: 'Line',
+			      borderColor: 'rgb(247, 117, 104)',
+			      borderWidth: 4,
+			      fill: false,
+			      data: [
+			        null,
+			        180,
+			        180,
+			        500,
+			        1050,
+			        1200,
+			        1428,
+			        1428,
+			        1428,
+			        1428,
+			      ],
+			      pointRadius: 0,
+			      datalabels: {
+			        display: false,
+			      },
+			    },
+			  ],
+			};
+
+			const options = {
+			  responsive: true,
+			  elements: {
+			    line: {
+			      tension: 0.05,
+			    },
+			  },
+			};
+
+			const chart = new Chart(ctx, {
+			  type: 'bar',
+			  data: data,
+			  options: options,
+			});
+
+			console.log(chart);
+		</script>
+	</body>
+</html>
